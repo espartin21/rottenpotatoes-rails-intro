@@ -12,11 +12,35 @@ class MoviesController < ApplicationController
 
   def index
     # valid sort_by values are "title" or "release_date"
-    @hilite = sort_by = params[:sort_by]
+    if params.key?(:sort_by)
+      session[:sort_by] = params[:sort_by]
+    elsif session.key?(:sort_by)
+      params[:sort_by] = session[:sort_by]
+    end
+
+    @hilite = sort_by = session[:sort_by]
 
     # filter by ratings
     @all_ratings = Movie.all_ratings
-    @selected_ratings = (params[:ratings].keys if params.key?(:ratings)) || @all_ratings
+
+    if params.key?(:ratings)
+      session[:ratings] = params[:ratings]
+    elsif session.key?(:ratings)
+      params[:ratings] = session[:ratings]
+    end
+
+    @selected_ratings = (session[:ratings].keys if session.key?(:ratings)) || @all_ratings
+
+    if params[:sort_by] != session[:sort_by] || params[:ratings] != session[:ratings]
+      if session.key?(:sort_by) and session[:sort_by] == 'title'
+        redirect_to :sort_by => 'title', :ratings => session['ratings']
+      elsif session.key?(:sort_by) and session[:sort_by] == 'release_date'
+        redirect_to :sort_by => 'release_date', :ratings => session['ratings']
+      else
+        redirect_to :ratings => session['ratings']
+      end
+      return
+    end
 
     @movies = Movie.order(sort_by).where(rating: @selected_ratings)
   end
