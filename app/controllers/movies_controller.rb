@@ -13,8 +13,12 @@ class MoviesController < ApplicationController
   def index
     # valid sort_by values are "title" or "release_date"
     @hilite = sort_by = params[:sort_by]
-    @movies = Movie.order(sort_by)
-    # @movies = Movie.all
+
+    # filter by ratings
+    @all_ratings = Movie.all_ratings
+    @selected_ratings = (params[:ratings].keys if params.key?(:ratings)) || @all_ratings
+
+    @movies = Movie.order(sort_by).where(rating: @selected_ratings)
   end
 
   def new
