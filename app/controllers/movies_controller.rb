@@ -33,8 +33,10 @@ class MoviesController < ApplicationController
 
     if params[:sort_by] != session[:sort_by] || params[:ratings] != session[:ratings]
       if session.key?(:sort_by) and session[:sort_by] == 'title'
+        flash.keep
         redirect_to :sort_by => 'title', :ratings => session['ratings']
       elsif session.key?(:sort_by) and session[:sort_by] == 'release_date'
+        flash.keep
         redirect_to :sort_by => 'release_date', :ratings => session['ratings']
       else
         redirect_to :ratings => session['ratings']
